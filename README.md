@@ -202,9 +202,4 @@ When deploying on **Render.com**:
 | **Backend & API** | Python 3.11, Flask, Gunicorn |
 | **Frontend** | Semantic HTML5, Modern CSS3 (Grid & Flexbox), Vanilla JavaScript (ES6+) |
 | **Reporting** | html2pdf.js |
-| **Deployment** | Docker, Render Cloud Platform |
-
----
-
-## 📜 License
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+| **Deployment** | Docker/ Render Cloud Platform |
