@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sickle Cell AI Diagnostic System </title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo-area">
+        <div class="logo-icon">🔬</div>
+        <div>
+          <h1>Sickle Cell Disease Detection & Risk Assessment</h1>
+          <p class="subtitle">Deep Learning (MobileNetV1) &bull; Grad-CAM &bull; OpenCV Morphology &bull; VORS Engine</p>
+        </div>
+      </div>
+      <div class="academic-badge">
+        <span>Capstone Project</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-layout">
+    <!-- Left Column: Inputs -->
+    <section class="card input-card">
+      <h2 class="section-title">1. Patient Smear & Clinical Vitals</h2>
+      
+      <form id="diagnostic-form">
+        <!-- Upload Box -->
+        <div class="form-group">
+          <label>Peripheral Blood Smear Image</label>
+          <div class="upload-dropzone" id="dropzone">
+            <input type="file" id="image-input" accept="image/*" hidden />
+            <div id="dropzone-prompt">
+              <div class="upload-icon">📁</div>
+              <p><strong>Click to browse</strong> or drag & drop smear image</p>
+              <span class="upload-hint">Supports PNG, JPG, JPEG (224x224 to 4K)</span>
+            </div>
+            <img id="image-preview" class="preview-img hidden" alt="Upload Preview" />
+          </div>
+        </div>
+
+        <!-- Clinical Vitals Grid -->
+        <div class="vitals-grid">
+          <div class="form-group">
+            <label for="age-input">Age (years)</label>
+            <input type="number" id="age-input" min="0" max="120" value="25" required />
+          </div>
+
+          <div class="form-group">
+            <label for="gender-input">Biological Sex</label>
+            <select id="gender-input" required>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="pain-input">Pain Crises / Year</label>
+            <input type="number" id="pain-input" min="0" max="30" value="1" required />
+          </div>
+
+          <div class="form-group">
+            <label for="spo2-input">SpO₂ Saturation (%)</label>
+            <input type="number" id="spo2-input" min="50" max="100" value="95" required />
+          </div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="primary-btn">
+          <span id="btn-text">Run Diagnostic Assessment</span>
+          <div id="btn-spinner" class="spinner hidden"></div>
+        </button>
+      </form>
+    </section>
+
+    <!-- Right Column: Results Dashboard -->
+    <section class="card results-card" id="results-container">
+      <div id="placeholder-view" class="placeholder-view">
+        <div class="placeholder-icon">📊</div>
+        <h3>No Analysis Performed Yet</h3>
+        <p>Upload a microscopic blood smear image and enter patient vitals on the left to generate the complete diagnostic report.</p>
+      </div>
+
+      <div id="report-view" class="report-view hidden">
+        <!-- Diagnosis Banner -->
+        <div id="diagnosis-banner" class="diagnosis-banner">
+          <div class="diagnosis-status">
+            <span class="status-indicator"></span>
+            <span id="diagnosis-text" class="diagnosis-title">POSITIVE</span>
+          </div>
+          <div class="confidence-box">
+            <span>Model Confidence:</span>
+            <strong id="confidence-val">99.2%</strong>
+          </div>
+        </div>
+
+                <!-- Patient Summary (for report context) -->
+        <div id="patient-summary" class="patient-summary">
+          <span>🧑 <strong>Age:</strong> <span id="ps-age">-</span></span>
+          <span>⚧ <strong>Sex:</strong> <span id="ps-gender">-</span></span>
+          <span>💉 <strong>SpO₂:</strong> <span id="ps-spo2">-</span>%</span>
+          <span>⚡ <strong>Pain Crises/yr:</strong> <span id="ps-pain">-</span></span>
+          <span>📅 <strong>Date:</strong> <span id="ps-date">-</span></span>
+        </div>
+
+        <!-- Dual Visualizations -->
+        <div class="vis-grid">
+          <div class="vis-box">
+            <h4>Grad-CAM Explainability</h4>
+            <div class="img-wrapper">
+              <img id="gradcam-img" alt="Grad-CAM Heatmap" />
+            </div>
+            <p class="vis-caption">Highlights spatial regions that influenced MobileNetV1</p>
+          </div>
+
+          <div class="vis-box">
+            <h4>Cell Segmentation & Clusters</h4>
+            <div class="img-wrapper">
+              <img id="cell-img" alt="Cell Segmentation Overlay" />
+            </div>
+            <p class="vis-caption">
+              <span class="legend-dot green"></span> Normal RBC &bull; 
+              <span class="legend-dot red"></span> Sickle &bull; 
+              <span class="legend-dot magenta"></span> Clustered
+            </p>
+          </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <span class="metric-label">Total RBC Count</span>
+            <span class="metric-value" id="m-total-rbc">-</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Sickle RBCs</span>
+            <span class="metric-value red-text" id="m-sickle-count">-</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Sickle Cell Index (SCI)</span>
+            <span class="metric-value" id="m-sci">-</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Clustering Density (CD)</span>
+            <span class="metric-value" id="m-cd">-</span>
+          </div>
+        </div>
+
+                <!-- Healthy Notice (shown when no disease detected) -->
+        <div id="healthy-notice-card" class="healthy-notice hidden">
+          <div class="notice-icon">✅</div>
+          <div>
+            <h3>No Sickle Cell Disease Detected</h3>
+            <p>The CNN model classified this smear as <strong>Negative</strong> and the morphology analysis found no significant sickle-shaped cells. Clinical severity scoring is not applicable for healthy smears.</p>
+          </div>
+        </div>
+
+        <!-- Clinical Severity & Risk Card (shown only when disease IS detected) -->
+        <div id="clinical-report-card" class="clinical-report-card hidden">
+          <h3>Clinical Risk & Severity Evaluation</h3>
+
+          <div class="clinical-metrics-row">
+            <div class="clinical-box">
+              <span class="box-label">Image-Based Severity Index (IBSI)</span>
+              <div class="box-val-row">
+                <span id="ibsi-val" class="bold-val">-</span>
+                <span id="severity-badge" class="badge">-</span>
+              </div>
+            </div>
+
+            <div class="clinical-box">
+              <span class="box-label">Estimated Hemoglobin Range</span>
+              <div class="box-val-row">
+                <span id="hb-range-val" class="bold-val">-</span>
+              </div>
+            </div>
+
+            <div class="clinical-box">
+              <span class="box-label">Vaso-Occlusion Risk (VORS)</span>
+              <div class="box-val-row">
+                <span id="vors-val" class="bold-val">-</span>
+                <span id="vors-badge" class="badge">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Risk Breakdown Progress Bars -->
+          <div class="vors-breakdown">
+            <h4>VORS Component Contributions</h4>
+            <div class="bar-item">
+              <span>Oxygen Saturation</span>
+              <div class="progress-bar"><div id="bar-spo2" class="fill"></div></div>
+            </div>
+            <div class="bar-item">
+              <span>Disease Severity</span>
+              <div class="progress-bar"><div id="bar-ibsi" class="fill"></div></div>
+            </div>
+            <div class="bar-item">
+              <span>Hemoglobin Deficiency Score</span>
+              <div class="progress-bar"><div id="bar-hb" class="fill"></div></div>
+            </div>
+            <div class="bar-item">
+              <span>Pain Crisis Risk</span>
+              <div class="progress-bar"><div id="bar-pain" class="fill"></div></div>
+            </div>
+          </div>
+        </div>
+                <!-- Download Button -->
+        <button id="download-pdf-btn" class="download-btn" onclick="downloadPDF()">
+          📄 Download PDF Report
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

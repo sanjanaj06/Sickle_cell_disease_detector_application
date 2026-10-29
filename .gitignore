@@ -1,0 +1,27 @@
+# Virtual environments
+.venv/
+venv1/
+env/
+ENV/
+
+# Large datasets and archives
+dataset*/
+*.zip
+*.tar.gz
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Test runs & outputs
+outputs/
+src/test_samples/
+project_structure.txt
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

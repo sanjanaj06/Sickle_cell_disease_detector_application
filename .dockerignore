@@ -1,0 +1,14 @@
+.git
+.github
+.venv
+venv1
+dataset*
+*.zip
+*.tar.gz
+outputs
+src/test_samples
+__pycache__
+*.pyc
+*.pyo
+.vscode
+project_structure.txt
