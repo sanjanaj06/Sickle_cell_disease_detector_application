@@ -11,21 +11,6 @@
 
 🌐 **Live Demo:** [sickle-cell-disease-detector-application.onrender.com](https://sickle-cell-disease-detector-application.onrender.com)
 
----
-
-## 📖 Table of Contents
-- [Project Overview](#-project-overview)
-- [Key Features](#-key-features)
-- [System Architecture (The 3-Gate Pipeline)](#-system-architecture-the-3-gate-pipeline)
-- [Mathematical & Clinical Formulations](#-mathematical--clinical-formulations)
-- [Clinical Dashboard & Web UI](#-clinical-dashboard--web-ui)
-- [Repository Structure](#-repository-structure)
-- [Local Setup & Installation](#-local-setup--installation)
-- [Cloud Deployment (Docker & Render)](#-cloud-deployment-docker--render)
-- [Technology Stack](#-technology-stack)
-
----
-
 ## 🩺 Project Overview
 
 Sickle Cell Disease (SCD) is a widespread genetic blood disorder characterized by stiff, crescent-shaped red blood cells (RBCs). These rigid cells can cluster and obstruct microvasculature, leading to acute **vaso-occlusive pain crises (VOC)** and organ ischemia.
